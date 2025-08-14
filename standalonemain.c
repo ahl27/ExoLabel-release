@@ -1,15 +1,10 @@
 //#include "ExoLabel/ExoLabel.h"
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
-
-//#ifdef _UNISTD_H
-//#include <unistd.h>
-//#endif
 
 //#ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -33,25 +28,27 @@ void display_help(){
   printf("    -V (--silent): suppress all output.\n");
   printf("\n");
 
-  printf("  Required value args:\n");
+  printf("  Required parameter args:\n");
   printf("    -i (--iterations) [integer]: set iterations to value.\n");
   printf("    -o (--output) [filename]: set name of output file.\n");
   printf("    -t (--tempdir) [dirname]: set directory to be used for temp files.\n");
   printf("\n");
 
-  printf("  Optional value args:\n");
+  printf("  Optional parameter args:\n");
   printf("    -a (--attenuate) [optional float]: set attenuation to value\n");
   printf("    -l (--self-loop) [optional float]: set self-loops to value.\n");
   printf("    -s (--skip-header-lines) [optional integer]: skip header lines in file.\n");
   printf("\n");
-  
-  printf("  Optional value args treat missing arguments as zero, e.g.:\n");
+
+  printf("  Optional parameter args treat missing arguments as zero, e.g.:\n");
   printf("   `ExoLabel [input files]`                 -> attenuation disabled\n");
   printf("   `ExoLabel [input files] --attenuate`     -> attenuation is 1.0\n");
   printf("   `ExoLabel [input files] --attenuate=2.0` -> attenuation is 2.0\n");
   printf("\n");
 
-  printf("Default configuration:\n");
+  printf("Invalid values (e.g., --self-loop=xyz) default to zero.\n\n");
+
+  printf("Default configuration (i.e., `ExoLabel [input_files]`):\n");
   printf("ExoLabel [input_files] \\\n");
   printf("  --iterations=0 --output=ExoLabel_result \\\n");
   printf("  --tempdir=. --attenuate=0 --self-loop=0 --skip-header-lines=0\n");
@@ -60,29 +57,6 @@ void display_help(){
   printf("\n");
 
   exit(0);
-  /*
-  Let's think about the requirements of this before starting
-    For now I'm just going to allow a single output value
-
-  Intended usage:
-
-  ExoLabel [input_files] [-adhiIlosStuV]
-
-
-  Optional Parameters:
-    -a --attenuate [value, 0/1]
-    -d --directed
-    -h --help
-    -i --iterations [value, 0]
-    -I --inplace-sort
-    -l --self-loop [value, 0]
-    -o --output [output_name]
-    -s --skip-header-lines [value, 0/1]
-    -S --space-separated
-    -t --tempdir [value]
-    -u --unweighted
-    -V --silent (not verbose)
-  */
 }
 
 int main (int argc, char *argv[]){
@@ -137,10 +111,12 @@ int main (int argc, char *argv[]){
     int argindex = 0;
     c = getopt_long(argc, argv, ":a:dhi:Il:o:s:St:uV", fields, &argindex);
 
-    // end of argument string
-    if(c == -1) break;
+    if(c == -1) break; // end of argument string
 
-    /* note that atof and atoi default to 0 if the input is invalid */
+    /*
+     * note that atof and atoi default to 0 if the input is invalid,
+     * which is honestly fine behavior for me.
+     */
     switch (c){
 
     case 0: // set an option -- do nothing and break
@@ -197,7 +173,7 @@ int main (int argc, char *argv[]){
       verbose = !verbose;
       break;
 
-    case ':':
+    case ':': // missing parameter for argument that requires one
       fprintf(stderr, "Error: Argument '%s' requires a parameter.\n", argv[optind-1]);
       exit(1);
 
@@ -205,13 +181,14 @@ int main (int argc, char *argv[]){
       fprintf(stderr, "Error: Unrecognized argument '%s'.\n", argv[optind-1]);
       exit(1);
 
-    default:
+    default: // should never get here
       fprintf(stderr, "Internal error, aborting...\n");
       abort();
     }
   }
 
-  const char sep = is_space_separated ? ' ' : '\t';
+  // fix some non-standard args into format expected by calling function
+  const char *seps = is_space_separated ? " \n" : "\t\n";
   if(!output_name)
     output_name = is_space_separated ? "ExoLabel_result.txt" : "ExoLabel_result.tsv";
 
@@ -242,48 +219,25 @@ int main (int argc, char *argv[]){
   printf("\nCharacter parameters:\n");
   printf("tempdir: %s\n", dir);
   printf("output_name: %s\n", output_name);
-  printf("separator: %s\n", sep == ' ' ? "SPACE" : "TAB");
+  printf("separator: %s\n", seps[0] == ' ' ? "SPACE" : "TAB");
 
   printf("\nInput Files:\n");
   for(int i=0; i<num_input_files; i++)
     printf("  %s\n", input_files[i]);
 
   printf("\n");
+
+  /*
+  C_LPOOM_cluster(input_files, num_input_files,
+                  dir, 1, &output_name,
+                  seps, &num_iter, verbose,
+                  is_undirected,
+                  &self_loop_weights,
+                  ignore_weights,
+                  use_inplace_sort,
+                  &atten_power,
+                  skip_header_lines);
+  */
   free(input_files);
   return 0;
-  /*
-    Optional Parameters:
-    -a --attenuate [value, 0/1]
-    -d --directed
-    -h --help
-    -i --iterations [value, 0]
-    -I --inplace-sort
-    -l --self-loop [value, 0]
-    -o --output [output_name]
-    -s --skip-header-lines [value, 0/1]
-    -S --space-separated
-    -t --tempdir [value]
-    -u --unweighted
-    -V --silent (not verbose)
-  */
-  /*
-   * Just needs to validate input and then call into C_LPOOM_cluster
-   int C_LPOOM_cluster(char** all_edgefiles,
-                    const int num_edgefiles, // files
-
-                    const char* dir, -
-                    const int num_ofiles,
-                    const char** all_outfiles, -
-                    const char* seps, -
-                    int* num_iter, *
-                    const int verbose, *
-                    const int is_undirected, *
-                    const double* self_loop_weights, *
-                    const int ignore_weights, *
-                    const int use_inplace_sort, *
-                    const double* atten_power, *
-                    const int skip_header_lines) *
-   */
-
-
 }
