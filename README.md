@@ -40,7 +40,7 @@ The basic usage pattern of ExoLabel is:
 exolabel [input edgelist files] [-adhiIlosStuV]
 ```
 
-`[input edgelist files]` is a set of files to analyze. This can be one or more files, including a wildcard expansion (e.g., `./folder/*.tsv`). Each file is expected to contain a set of lines, where each individual line denotes a single edge in the network.
+`[input edgelist files]` is a set of files to analyze. This can be one or more files, including a wildcard expansion (e.g., `./folder/*.tsv`). Each file is expected to contain a set of lines, where each individual line denotes a single edge in the network. Input files can be either uncompressed or gz-compressed.
 
 The default parameterization expects input files to be tab-separated values. Each line is expected to contain three values, corresponding to the start vertex, end vertex, and edge weight (e.g., `abc def 0.45`). Each edge is treated as an undirected edge.
 
@@ -91,7 +91,7 @@ exolabel [input files] --attenuate     -> attenuation is 1.0
 exolabel [input files] --attenuate=2.0 -> attenuation is 2.0
 ```
 
-As with required parameter arguments, note that invalid arguments (e.g., `--random-seed=abc`) will be treated as 0.
+As with required parameter arguments, invalid arguments (e.g., `--random-seed=abc`) will be treated as 0.
 
 * `-a (--attenuate) [optional float]`: Enables attenuation, which decreases the contribution of a node to determining the next node's community the further the node is from its initial source. This reduces the ability of a single "monster group" to dominate results. Defaults to disabled, sets to enabled (1.0) if passed as a flag. If given a parameter, specifies the strength of attenuation. Higher values create smaller communities, whereas smaller values create larger communities.
 * `-l (--self-loop) [optional float]`: Enables self-loops, potentially setting them to a specific value if provided. Self-loops are used as a cutoff value rather than a genuine self-loop. This means that, in order for a node to be assigned to a community, at least one of its incoming edges must be at least the value of `self-loop`. For example, suppose node A has 4 incoming edges -- 3 from community 1, each with weight 0.2, and one from community 2 with weight 0.5. If self-loops are disabled, node A will be assigned to community 1, since the total weight of community 1 is 0.6. However, if self-loops are set to 0.5, node A will be assigned to community 2, since no edge from community 1 is at least 0.5 (and at least one from community 2 is).
