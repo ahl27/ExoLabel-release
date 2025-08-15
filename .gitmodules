@@ -1,0 +1,3 @@
+[submodule "src/ExoLabel"]
+	path = src/ExoLabel
+	url = https://github.com/ahl27/ExoLabel.git
