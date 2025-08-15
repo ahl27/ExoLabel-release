@@ -56,11 +56,12 @@ Additional optional arguments:
    `ExoLabel [input files] --attenuate`     -> attenuation is 1.0
    `ExoLabel [input files] --attenuate=2.0` -> attenuation is 2.0
 
-Invalid values (e.g., --self-loop=xyz) default to zero.\n
+Invalid values (e.g., --self-loop=xyz) default to zero.
+
 Default configuration (i.e., `ExoLabel [input_files]`):
-ExoLabel [input_files] \
-  --iterations=0 --output=ExoLabel_result \
-  --tempdir=. --attenuate=0 --self-loop=0 --skip-header-lines=0
-undirected networks, no in-place sort, tab-separated files,
-weighted networks, all normal output displaye
+  ExoLabel [input_files] \
+    --iterations=0 --output=ExoLabel_result \
+    --tempdir=. --attenuate=0 --self-loop=0 --skip-header-lines=0
+  undirected networks, no in-place sort, tab-separated files,
+  weighted networks, all normal output displayed
 ```
