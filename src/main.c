@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 //#ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -17,7 +18,9 @@ void stop_invalid_input(const char* argname, const char* argval){
 
 void display_help(){
   printf("Usage: ExoLabel [input_files] [-adhiIlosStuV]\n\n");
-  printf("Additional optional arguments:\n");
+  printf("•-----------------------•\n");
+  printf("| Additional  arguments |\n");
+  printf("•-----------------------•\n");
 
   printf("  Flags:\n");
   printf("    -d (--directed): treat input edgelist files as directed.\n");
@@ -31,6 +34,7 @@ void display_help(){
   printf("  Required parameter args:\n");
   printf("    -i (--iterations) [integer]: set iterations to value.\n");
   printf("    -o (--output) [filename]: set name of output file.\n");
+  printf("    -r (--random-seed) [integer]: set random seed.\n");
   printf("    -t (--tempdir) [dirname]: set directory to be used for temp files.\n");
   printf("\n");
 
@@ -46,14 +50,28 @@ void display_help(){
   printf("   `ExoLabel [input files] --attenuate=2.0` -> attenuation is 2.0\n");
   printf("\n");
 
-  printf("Invalid values (e.g., --self-loop=xyz) default to zero.\n\n");
-
-  printf("Default configuration (i.e., `ExoLabel [input_files]`):\n");
+  printf("•-----------------------•\n");
+  printf("| Default configuration |\n");
+  printf("•-----------------------•\n");
+  printf("(i.e., `ExoLabel [input_files]`)\n\n");
   printf("ExoLabel [input_files] \\\n");
   printf("  --iterations=0 --output=ExoLabel_result \\\n");
   printf("  --tempdir=. --attenuate=0 --self-loop=0 --skip-header-lines=0\n");
   printf("undirected networks, no in-place sort, tab-separated files,\n");
   printf("weighted networks, all normal output displayed.");
+  printf("\n\n");
+
+  printf("•------------------•\n");
+  printf("| Additional notes |\n");
+  printf("•------------------•\n");
+  printf("Invalid values (e.g., --self-loop=xyz) default to zero.\n\n");
+
+  printf("Long-form parameters MUST be specified with either no space\n"
+          "or an equal sign due to how argument parsing works. For example:\n");
+  printf("  * `ExoLabel ... --attenuate=2.0 -> attenuation set to 2.0\n");
+  printf("  * `ExoLabel ... --attenuate2.0 -> attenuation set to 2.0\n");
+  printf("  * `ExoLabel ... -a 2.0 -> attenuation set to 2.0\n");
+  printf("  * `ExoLabel ... --attenuate 2.0 -> will NOT work properly\n");
   printf("\n");
 
   exit(0);
@@ -79,6 +97,9 @@ int main (int argc, char *argv[]){
   const char *dir = "./",
             *output_name = NULL;
 
+  // if a seed is specified, it'll be loaded in later
+  unsigned int random_seed = time(NULL);
+
   /*
    * struct option has the following fields:
    *  - const char *name
@@ -103,13 +124,14 @@ int main (int argc, char *argv[]){
     {"self-loop", optional_argument, NULL, 'l'},
     {"output", required_argument, NULL, 'o'},
     {"help", no_argument, NULL, 'h'},
+    {"random-seed", required_argument, NULL, 'r'},
     {0,0,0,0}
   };
 
   int c;
   while(true){
     int argindex = 0;
-    c = getopt_long(argc, argv, ":a:dhi:Il:o:s:St:uV", fields, &argindex);
+    c = getopt_long(argc, argv, ":a:dhi:Il:o:r:s:St:uV", fields, &argindex);
 
     if(c == -1) break; // end of argument string
 
@@ -151,6 +173,10 @@ int main (int argc, char *argv[]){
 
     case 'o': // output name
       output_name = optarg;
+      break;
+
+    case 'r': // random seed
+      random_seed = atoi(optarg);
       break;
 
     case 's': // skip header lines
@@ -203,31 +229,34 @@ int main (int argc, char *argv[]){
   for(int i=0; i<num_input_files; i++)
     input_files[i] = argv[optind + i];
 
-  printf("\nBoolean parameters:\n");
-  printf("ignore_weights: %d\n", ignore_weights);
-  printf("use_inplace_sort: %d\n", use_inplace_sort);
-  printf("is_undirected: %d\n", is_undirected);
-  printf("verbose: %d\n", verbose);
-  printf("is_space_separated: %d\n", is_space_separated);
+  if(verbose){
+    printf("\nBoolean parameters:\n");
+    printf("ignore_weights: %s\n", ignore_weights ? "true" : "false");
+    printf("use_inplace_sort: %s\n", use_inplace_sort ? "true" : "false");
+    printf("is_undirected: %s\n", is_undirected ? "true" : "false");
+    printf("verbose: %s\n", verbose ? "true" : "false");
+    printf("is_space_separated: %s\n", is_space_separated ? "true" : "false");
 
-  printf("\nNumeric parameters:\n");
-  printf("num_iter: %d\n", num_iter);
-  printf("skip_header_lines: %d\n", skip_header_lines);
-  printf("atten_power: %.01f\n", atten_power);
-  printf("self_loop_weights: %.01f\n", self_loop_weights);
+    printf("\nNumeric parameters:\n");
+    printf("num_iter: %d\n", num_iter);
+    printf("skip_header_lines: %d\n", skip_header_lines);
+    printf("atten_power: %.01f\n", atten_power);
+    printf("self_loop_weights: %.01f\n", self_loop_weights);
+    printf("random seed: %u\n", random_seed);
 
-  printf("\nCharacter parameters:\n");
-  printf("tempdir: %s\n", dir);
-  printf("output_name: %s\n", output_name);
-  printf("separator: %s\n", seps[0] == ' ' ? "SPACE" : "TAB");
+    printf("\nCharacter parameters:\n");
+    printf("tempdir: %s\n", dir);
+    printf("output_name: %s\n", output_name);
+    printf("separator: %s\n", seps[0] == ' ' ? "SPACE" : "TAB");
 
-  printf("\nInput Files:\n");
-  for(int i=0; i<num_input_files; i++)
-    printf("  %s\n", input_files[i]);
+    printf("\nInput Files:\n");
+    for(int i=0; i<num_input_files; i++)
+      printf("  %s\n", input_files[i]);
 
-  printf("\n");
+    printf("\n");
+  }
 
-  /*
+  srand(random_seed);
   C_LPOOM_cluster(input_files, num_input_files,
                   dir, 1, &output_name,
                   seps, &num_iter, verbose,
@@ -237,7 +266,6 @@ int main (int argc, char *argv[]){
                   use_inplace_sort,
                   &atten_power,
                   skip_header_lines);
-  */
   free(input_files);
   return 0;
 }
