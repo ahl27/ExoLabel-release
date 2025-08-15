@@ -1,8 +1,33 @@
 # ExoLabel (commandline C distribution)
 
-This is the standalone ExoLabel distribution that can be run from the commandline. Full documentation is coming soon. In the meantime, the help file is included below.
+This is the standalone ExoLabel distribution that can be run from the commandline.
 
-This is **IN-PROGRESS** and will not yet work.
+## Compiling
+
+To compile ExoLabel for your machine, first clone the repository with included submodules:
+
+```sh
+git clone --recurse-submodules https://github.com/ahl27/ExoLabel-release.git
+```
+
+Then enter the directory and run `make`:
+```sh
+cd ExoLabel-release
+make
+```
+
+This should compile an executable called `exolabel`. To view the man page:
+```sh
+./exolabel --help
+```
+
+Note that `ExoLabel` requires both `unistd.h` and `zlib.h`. This distribution is not tested on nor guaranteed to work on Windows. Windows users are encouraged to run ExoLabel via its R distribution.
+
+I'm happy to accept a PR with changes that enable this version of ExoLabel to run on Windows.
+
+## Running ExoLabel
+
+This is **IN-PROGRESS** and may not yet work.
 
 Help message:
 ```

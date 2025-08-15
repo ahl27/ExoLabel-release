@@ -1,1 +1,4 @@
 bin/*
+exolabel
+.DS_Store
+src/.DS_Store

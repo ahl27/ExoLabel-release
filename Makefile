@@ -1,24 +1,27 @@
-IDIR=./ExoLabel
-ODIR=./bin
+IDIR=src/ExoLabel
+ODIR=bin
 
 CC=gcc
-VPATH=src:src/ExoLabel
-LIBS=
+VPATH=src:src/ExoLabel:bin
 
-DEPS = ExoLabel.h FileHandlers.h LoserTree.h PrefixTrie.h FallbackDefines.h
-#DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+_DEPS = ExoLabel.h FileHandlers.h LoserTree.h PrefixTrie.h FallbackDefines.h
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-objects = main.o ExoLabel.o FileHandlers.o LoserTree.o PrefixTrie.o
-#objects = $(patsubst %,$(ODIR)/%,$(_objects))
+_objects = main.o ExoLabel.o FileHandlers.o LoserTree.o PrefixTrie.o
+objects = $(patsubst %,$(ODIR)/%,$(_objects))
 
 exolabel: $(objects)
-	cc -o exolabel $(objects)
-
-main.o: ExoLabel.h
-ExoLabel.o: FallbackDefines.h ExoLabel.h PrefixTrie.h LoserTree.h FileHandlers.h
-PrefixTree.o: FallbackDefines.h PrefixTrie.h
-FileHandlers.o: FallbackDefines.h FileHandlers.h
-LoserTree.o: FallbackDefines.h LoserTree.h FileHandlers.h
+	cc -lz -o exolabel $(objects)
+$(ODIR):
+	mkdir -p $(ODIR)
+$(ODIR)/%.o: %.c $(_DEPS)
+	@mkdir -p $(ODIR)
+	@$(CC) $(CFLAGS) -c -o $@ $<
+# $(ODIR)/main.o: ExoLabel.h
+# $(ODIR)/ExoLabel.o: FallbackDefines.h ExoLabel.h PrefixTrie.h LoserTree.h FileHandlers.h
+# $(ODIR)/PrefixTrie.o: FallbackDefines.h PrefixTrie.h
+# $(ODIR)/FileHandlers.o: FallbackDefines.h FileHandlers.h
+# $(ODIR)/LoserTree.o: FallbackDefines.h LoserTree.h FileHandlers.h
 
 # ExoLabel.o: $(DEPS)
 # PrefixTree.o: $(DEPS)
@@ -28,4 +31,4 @@ LoserTree.o: FallbackDefines.h LoserTree.h FileHandlers.h
 .PHONY: clean
 
 clean:
-	rm exolabel $(objects)
+	rm -rf $(OBJDIR) && rm -f exolabel
