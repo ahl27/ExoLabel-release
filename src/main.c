@@ -17,7 +17,7 @@ void stop_invalid_input(const char* argname, const char* argval){
 }
 
 void display_help(){
-  printf("Usage: ExoLabel [input_files] [-adhiIlosStuV]\n\n");
+  printf("Usage: exolabel [input edgelist files] [-adhiIlosStuV]\n\n");
   printf("•-----------------------•\n");
   printf("| Additional  arguments |\n");
   printf("•-----------------------•\n");
@@ -45,15 +45,15 @@ void display_help(){
   printf("\n");
 
   printf("  Optional parameter args treat missing arguments as zero, e.g.:\n");
-  printf("   `ExoLabel [input files]`                 -> attenuation disabled\n");
-  printf("   `ExoLabel [input files] --attenuate`     -> attenuation is 1.0\n");
-  printf("   `ExoLabel [input files] --attenuate=2.0` -> attenuation is 2.0\n");
+  printf("   `exolabel [input files]`                 -> attenuation disabled\n");
+  printf("   `exolabel [input files] --attenuate`     -> attenuation is 1.0\n");
+  printf("   `exolabel [input files] --attenuate=2.0` -> attenuation is 2.0\n");
   printf("\n");
 
   printf("•-----------------------•\n");
   printf("| Default configuration |\n");
   printf("•-----------------------•\n");
-  printf("(i.e., `ExoLabel [input_files]`)\n\n");
+  printf("(i.e., `exolabel [input_files]`)\n\n");
   printf("ExoLabel [input_files] \\\n");
   printf("  --iterations=0 --output=ExoLabel_result \\\n");
   printf("  --tempdir=. --attenuate=0 --self-loop=0 --skip-header-lines=0\n");
@@ -68,10 +68,10 @@ void display_help(){
 
   printf("Long-form parameters MUST be specified with either no space\n"
           "or an equal sign due to how argument parsing works. For example:\n");
-  printf("  * `ExoLabel ... --attenuate=2.0 -> attenuation set to 2.0\n");
-  printf("  * `ExoLabel ... --attenuate2.0 -> attenuation set to 2.0\n");
-  printf("  * `ExoLabel ... -a 2.0 -> attenuation set to 2.0\n");
-  printf("  * `ExoLabel ... --attenuate 2.0 -> will NOT work properly\n");
+  printf("  * `exolabel ... --attenuate=2.0 -> attenuation set to 2.0\n");
+  printf("  * `exolabel ... --attenuate2.0 -> attenuation set to 2.0\n");
+  printf("  * `exolabel ... -a 2.0 -> attenuation set to 2.0\n");
+  printf("  * `exolabel ... --attenuate 2.0 -> will NOT work properly\n");
   printf("\n");
 
   exit(0);
