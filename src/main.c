@@ -66,12 +66,13 @@ void display_help(){
   printf("•------------------•\n");
   printf("Invalid values (e.g., --self-loop=xyz) default to zero.\n\n");
 
-  printf("Long-form parameters MUST be specified with either no space\n"
+  printf("Optional parameter arguments MUST be specified with either no space\n"
           "or an equal sign due to how argument parsing works. For example:\n");
-  printf("  * `exolabel ... --attenuate=2.0 -> attenuation set to 2.0\n");
-  printf("  * `exolabel ... --attenuate2.0 -> attenuation set to 2.0\n");
-  printf("  * `exolabel ... -a 2.0 -> attenuation set to 2.0\n");
-  printf("  * `exolabel ... --attenuate 2.0 -> will NOT work properly\n");
+  printf("  * `exolabel ... --attenuate=2.0` -> attenuation set to 2.0\n");
+  printf("  * `exolabel ... --attenuate2.0`  -> attenuation set to 2.0\n");
+  printf("  * `exolabel ... -a2.0`           -> attenuation set to 2.0\n");
+  printf("  * `exolabel ... -a 2.0`          -> will NOT work properly\n");
+  printf("  * `exolabel ... --attenuate 2.0` -> will NOT work properly\n");
   printf("\n");
 
   exit(0);
@@ -131,7 +132,7 @@ int main (int argc, char *argv[]){
   int c;
   while(true){
     int argindex = 0;
-    c = getopt_long(argc, argv, ":a:dhi:Il:o:r:s:St:uV", fields, &argindex);
+    c = getopt_long(argc, argv, ":a::dhi:Il::o:r:s::St:uV", fields, &argindex);
 
     if(c == -1) break; // end of argument string
 
@@ -211,6 +212,10 @@ int main (int argc, char *argv[]){
       fprintf(stderr, "Internal error, aborting...\n");
       abort();
     }
+  }
+
+  if(ignore_weights && self_loop_weights != 0.0){
+    printf("Warning: Specifying self-loops with unweighted graphs is discouraged.\n");
   }
 
   // fix some non-standard args into format expected by calling function
